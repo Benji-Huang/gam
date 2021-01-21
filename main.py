@@ -1,6 +1,12 @@
 # main.py
 # make an original game
 
+# TODO:
+#   * Make sprite follow mouse
+#   * Change snow to an enemy sprite
+#   * Add a background picture
+#   * Player collision with enemies
+
 import pygame
 import random
 
@@ -43,6 +49,18 @@ class Snow:
             self.x = random.randrange(0, WIDTH)
             self.y = random.randrange(-15, 0)
 
+# Create  player class
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.image.load("./images/rowlet.png")
+        self.image = pygame.transform.scale(self.image, (37, 44))
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        # Changes the position of the player based on the mouse's position
+        self.rect.center = pygame.mouse.get_pos()
+
 def main():
     pygame.init()
 
@@ -54,6 +72,13 @@ def main():
     # ----- LOCAL VARIABLES
     done = False
     clock = pygame.time.Clock()
+
+    # Sprite group and sprite creation
+    all_sprite_group = pygame.sprite.Group()
+
+    # Player creation
+    player = Player()
+    all_sprite_group.add(player)
 
     # Create snow objects
     snow_list = []
@@ -82,6 +107,7 @@ def main():
         screen.fill(BLACK)
         for snow in snow_list:
             snow.draw(screen)
+        all_sprite_group.draw(screen)
 
         # ----- UPDATE
         pygame.display.flip()
