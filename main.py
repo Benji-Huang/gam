@@ -2,10 +2,9 @@
 # make an original game
 
 # TODO:
-#   * Make sprite follow mouse
-#   * Change snow to an enemy sprite
+#   * Spawn enemies randomly above y = 0
+#   * Don't allow players to go above a specific height
 #   * Add a background picture
-#   * Player collision with enemies
 
 import pygame
 import random
@@ -15,51 +14,39 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 SKY_BLUE = (95, 165, 228)
-WIDTH = 1080
-HEIGHT = 900
-NUM_SNOW = 100
+WIDTH = 600
+HEIGHT = 1000
+MAX_ENEMY = 100
 TITLE = "<You're title here>"
 
-# Create snow class based on snowscape project
-class Snow:
-    def __init__(self, radius=1):
-        self.radius = radius
-
-        self.x, self.y = (
-            random.randrange(0, WIDTH),
-            random.randrange(0, HEIGHT)
-        )
-
-        self.colour = WHITE
-
-        self.vel_y = random.choice([1, 2])
-
-    def draw(self, screen):
-        pygame.draw.circle(
-            screen,
-            self.colour,
-            (self.x, self.y),
-            self.radius
-        )
-
-    def update(self):
-        self.y += self.vel_y
-
-        if self.y > HEIGHT:
-            self.x = random.randrange(0, WIDTH)
-            self.y = random.randrange(-15, 0)
-
-# Create  player class
+# Create player class
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("./images/rowlet.png")
-        self.image = pygame.transform.scale(self.image, (37, 44))
+        self.image = pygame.image.load("./images/toad.png")
+        self.image = pygame.transform.scale(self.image, (54, 75))
         self.rect = self.image.get_rect()
 
     def update(self):
         # Changes the position of the player based on the mouse's position
         self.rect.center = pygame.mouse.get_pos()
+
+# Create enemy class
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, xcoord):
+        super().__init__()
+        self.image = pygame.image.load("./images/thwomp.png")
+        self.image = pygame.transform.scale(self.image, (107, 120))
+        self.rect = self.image.get_rect()
+
+
+        self.rect.centerx = xcoord
+        self.rect.centery = 0
+
+        self.vel_y = 5
+
+    def update(self):
+        self.rect.y += self.vel_y
 
 def main():
     pygame.init()
@@ -75,22 +62,17 @@ def main():
 
     # Sprite group and sprite creation
     all_sprite_group = pygame.sprite.Group()
+    enemy_group = pygame.sprite.Group()
 
-    # Player creation
+    # Player and enemy creation
     player = Player()
     all_sprite_group.add(player)
 
-    # Create snow objects
-    snow_list = []
-
-    # Farther snow
-    for i in range(NUM_SNOW):
-        snow = Snow()
-        snow_list.append(snow)
-    for i in range (NUM_SNOW):
-        snow = Snow(random.choice([3, 4]))
-        snow.vel_y = random.choice([4, 5])
-        snow_list.append(snow)
+    # Enemy
+    for i in range(MAX_ENEMY):
+        enemy = Enemy(WIDTH)
+        all_sprite_group.add(enemy)
+        enemy_group.add(enemy)
 
     # ----- MAIN LOOP
     while not done:
@@ -100,13 +82,15 @@ def main():
                 done = True
 
         # ----- LOGIC
-        for snow in snow_list:
-            snow.update()
+        all_sprite_group.update()
+
+        # Player collides with a jewel
+        enemies_hit = pygame.sprite.spritecollide(player, enemy_group, False)
+        if len(enemies_hit) > 0:
+            player.kill()
 
         # ----- DRAW
         screen.fill(BLACK)
-        for snow in snow_list:
-            snow.draw(screen)
         all_sprite_group.draw(screen)
 
         # ----- UPDATE
