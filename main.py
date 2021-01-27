@@ -2,24 +2,22 @@
 # make an original game
 
 # TODO:
-#   * Spawn enemies randomly above y = 0
-#   * Don't allow players to go above a specific height
-#   * Add a background picture
+#   * Spawn multiple enemies
+#   * Change controlto WASD
+#   * Print score in terminal
 
 import pygame
 import random
 
 # ----- CONSTANTS
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-YELLOW = (255, 255, 0)
-SKY_BLUE = (95, 165, 228)
+GREEN = (0, 170, 40)
 WIDTH = 600
-HEIGHT = 1000
-MAX_ENEMY = 100
-TITLE = "<You're title here>"
+HEIGHT = 800
+MAX_ENEMY = 10
+ENEMY_VEL = 20
+TITLE = "squish"
 
-# Create player class
+# Create player class, scale image
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -30,23 +28,27 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         # Changes the position of the player based on the mouse's position
         self.rect.center = pygame.mouse.get_pos()
+                
+        # Restrict player height
+        if self.rect.top < HEIGHT - 75:
+            self.rect.top = HEIGHT - 75
 
-# Create enemy class
+# Create enemy class, scale image
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, xcoord):
+    def __init__(self):
         super().__init__()
         self.image = pygame.image.load("./images/thwomp.png")
         self.image = pygame.transform.scale(self.image, (107, 120))
         self.rect = self.image.get_rect()
-
-
-        self.rect.centerx = xcoord
-        self.rect.centery = 0
-
-        self.vel_y = 5
+    
+        self.rect.x = random.randrange(0, WIDTH)
+        self.rect.y = random.randrange(-20, 0)
+        
+        self.vel_y = ENEMY_VEL
 
     def update(self):
         self.rect.y += self.vel_y
+        
 
 def main():
     pygame.init()
@@ -69,10 +71,9 @@ def main():
     all_sprite_group.add(player)
 
     # Enemy
-    for i in range(MAX_ENEMY):
-        enemy = Enemy(WIDTH)
-        all_sprite_group.add(enemy)
-        enemy_group.add(enemy)
+    enemy = Enemy()
+    all_sprite_group.add(enemy)
+    enemy_group.add(enemy)
 
     # ----- MAIN LOOP
     while not done:
@@ -90,7 +91,7 @@ def main():
             player.kill()
 
         # ----- DRAW
-        screen.fill(BLACK)
+        screen.fill(GREEN)
         all_sprite_group.draw(screen)
 
         # ----- UPDATE
@@ -102,3 +103,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
