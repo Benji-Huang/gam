@@ -87,6 +87,7 @@ def main():
     clock = pygame.time.Clock()
     thwomp_spawn_time = 450
     last_thwomp_spawn = pygame.time.get_ticks()
+    play_dead_sound = False
 
     # Score
     score_value = 0
@@ -124,6 +125,9 @@ def main():
     # Background music
     pygame.mixer.music.load("./assets/bgm.mp3")
     pygame.mixer.music.play(-1)
+
+    # Death music
+    dead_sound = pygame.mixer.Sound("./assets/dead.mp3")
 
     # ----- MAIN LOOP
     while not done:
@@ -183,8 +187,16 @@ def main():
         if lives_value <= 0:
             game_over = True
             player.vel_x = 0
+            # Play squish sound
+            if not play_dead_sound:
+                pygame.mixer.Sound.play(dead_sound)
+                play_dead_sound = True
+            # Stop enemy sounds
             for enemy in enemy_group:
                 enemy.kill()
+
+            # Stop background music
+            pygame.mixer.music.stop()
 
         # ----- DRAW
         background_group.draw(screen)
