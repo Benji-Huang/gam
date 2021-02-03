@@ -121,6 +121,10 @@ def main():
     bg = Background()
     background_group.add(bg)
 
+    # Background music
+    pygame.mixer.music.load("./assets/bgm.mp3")
+    pygame.mixer.music.play(-1)
+
     # ----- MAIN LOOP
     while not done:
         # -- Event Handler
