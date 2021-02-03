@@ -1,17 +1,12 @@
 # main.py
 # make an original game
 
-# TODO:
-#   * Display game over message
-#   * If player moves to far right/left of screen, teleport to other side of screen
-
 import pygame
 import random
 
 # ----- CONSTANTS
-GREEN = (0, 170, 40)
 WIDTH = 600
-HEIGHT = 900
+HEIGHT = 850
 ENEMY_VEL = 20
 LIVES = 1
 TITLE = "mushroom smush"
@@ -73,7 +68,7 @@ class Enemy(pygame.sprite.Sprite):
 
         # Spawn a thwomp randomly at the top of the screen
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
-        self.rect.y = random.randrange(-500, -20)
+        self.rect.y = random.randrange(-250, -150)
 
     def update(self):
         self.rect.y += self.vel_y
@@ -90,7 +85,7 @@ def main():
     # ----- LOCAL VARIABLES
     done = False
     clock = pygame.time.Clock()
-    thwomp_spawn_time = 500
+    thwomp_spawn_time = 450
     last_thwomp_spawn = pygame.time.get_ticks()
 
     # Score
@@ -112,16 +107,6 @@ def main():
     def display_lives(x, y):
         lives = font.render("Lives: " + str(lives_value), True, (0, 0, 0))
         screen.blit(lives, (x, y))
-
-    # Game over
-    #game_over_x = WIDTH / 2
-    #game_over_y = HEIGHT / 2
-    #
-    #def display_game_over(x, y):
-    #    game_over = font.render("GAME OVER", True, (0, 0, 0))
-    #    screen.blit(display_game_over, (x, y))
-
-
 
     # Sprite groups
     all_sprite_group = pygame.sprite.Group()
@@ -205,13 +190,11 @@ def main():
         # ----- UPDATE
         display_score(text_score_x, text_score_y)
         display_lives(text_lives_x, text_lives_y)
-        #display_game_over(game_over_x, game_over_y)
         pygame.display.update(dirty_rectangles)
         pygame.display.flip()
         clock.tick(60)
 
     pygame.quit()
-
 
 if __name__ == "__main__":
     main()
